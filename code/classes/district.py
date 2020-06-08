@@ -6,7 +6,8 @@ class District():
         self.name = name
         self.houses = self.load_houses(f"data/{name}/{name}_houses.csv")
         self.batteries = self.load_batteries(f"data/{name}/{name}_batteries.csv")
-    
+        self.cables = []
+
     def load_houses(self, source_file):
         """
         Load all the houses.
@@ -37,3 +38,6 @@ class District():
             
         return batteries
     
+    def add_cable(self, cable):
+        self.cables.append(cable)
+

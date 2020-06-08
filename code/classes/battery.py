@@ -1,6 +1,12 @@
 class Battery():
-    price = 5000
+
     def __init__(self, position, capacity):
         self.position = position
-        self.capacity = capacity
-        self.price = price
+        self.capacity = float(capacity)
+        self.price = 5000
+        self.connected = []
+        self.remainder = float(capacity)
+    
+    def add_house(self, house):
+        self.connected.append(house)
+        self.remainder -= house.maxoutput
