@@ -56,6 +56,9 @@ def random_connect_battery(district, house):
     for battery_choice in battery_choices: 
         if battery_choice.remainder < house.maxoutput:
             battery_choices.remove(battery_choice)
+    
+    #testing fault in code
+    print("district batteries: ", len(district.batteries))
 
     # Checking if connections are possible
     if len(battery_choices) > 0: 

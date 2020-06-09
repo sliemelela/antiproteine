@@ -13,10 +13,10 @@ if __name__ == "__main__":
         print(randomize.random_connect_battery(district, house))
 
     # Checking cable positions
-    for cable in district.cables:
-        print("CABLE BEGINS HERE")
-        print(cable.positions)
-        print("CABLE ENDS HERE")
+    # for cable in district.cables:
+    #     print("CABLE BEGINS HERE")
+    #     print(cable.positions)
+    #     print("CABLE ENDS HERE")
 
     # Check amount of cables 
     print(len(district.cables))
