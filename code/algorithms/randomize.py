@@ -1,5 +1,5 @@
 from code.classes import district, cable
-import random
+import random, copy
 
 # Pick a house (we are going to loop through every house)
 # We pick a battery RANDOMLY for that house that satisfies constraints
@@ -50,15 +50,12 @@ def generate_random_cable(house_position, battery_position):
 def random_connect_battery(district, house):
 
     # Loading district and batteries
-    battery_choices = district.batteries
+    battery_choices = copy.deepcopy(district.batteries)
 
     # Checking which batteries can be connected
     for battery_choice in battery_choices: 
         if battery_choice.remainder < house.maxoutput:
             battery_choices.remove(battery_choice)
-    
-    #testing fault in code
-    print("district batteries: ", len(district.batteries))
 
     # Checking if connections are possible
     if len(battery_choices) > 0: 
