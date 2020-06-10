@@ -1,5 +1,5 @@
 from code.classes import district
-from code.algorithms import randomize
+from code.algorithms import randomize, random_swap
 
 
 if __name__ == "__main__":
@@ -9,14 +9,29 @@ if __name__ == "__main__":
     district = district.District(data_folder)
 
     # Generate random configuration in state space
+    no_connections = []
     for house in district.houses:
-        print(randomize.random_connect_battery(district, house))
+        if random_swap.random_connect_battery(district, house) is False:
+            no_connections.append(house)
 
-    # Checking cable positions
-    # for cable in district.cables:
-    #     print("CABLE BEGINS HERE")
-    #     print(cable.positions)
-    #     print("CABLE ENDS HERE")
-
-    # Check amount of cables 
+    # Check amount of cables
     print(len(district.cables))
+
+    # Swapping houses from biggest remainder battery to other random batteries
+    random_swap.swap_connects(district)
+
+    # Checking if swapping was done correctly
+    for battery in district.batteries:
+        print("connected: ", len(battery.connected))
+        print("remainder: ", battery.remainder)
+    print(len(district.cables))
+
+    # Attempt connecting houses again (that were not conected)
+    for house in no_connections:
+        print(house.maxoutput)
+        random_swap.random_connect_battery(district, house)
+    print(len(no_connections))
+    
+
+    ##CONCLUSION: Just swapping from biggest remainder to another random battery does not help!
+    ## Need to choose to which battery we should swap! (next optimization step)

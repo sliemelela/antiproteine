@@ -50,12 +50,15 @@ def generate_random_cable(house_position, battery_position):
 def random_connect_battery(district, house):
 
     # Loading district and batteries
-    battery_choices = copy.deepcopy(district.batteries)
+    battery_options = []
+    for battery_option in district.batteries:
+        battery_options.append(battery_option)
 
     # Checking which batteries can be connected
-    for battery_choice in battery_choices: 
-        if battery_choice.remainder < house.maxoutput:
-            battery_choices.remove(battery_choice)
+    battery_choices = []
+    for battery_choice in battery_options:
+        if battery_choice.remainder > house.maxoutput:
+            battery_choices.append(battery_choice)
 
     # Checking if connections are possible
     if len(battery_choices) > 0: 
@@ -70,12 +73,12 @@ def random_connect_battery(district, house):
 
         # Generating a random cable
         cable = generate_random_cable(house_position, battery_position)
+        
+        # Storing connection
+        house.add_cable(cable)
         district.add_cable(cable)
 
         return True
 
     else:
         return False
-
-
-

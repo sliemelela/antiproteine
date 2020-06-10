@@ -41,3 +41,6 @@ class District():
     def add_cable(self, cable):
         self.cables.append(cable)
 
+    def delete_cable(self, cable):
+        self.cables.remove(cable)
+

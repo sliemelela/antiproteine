@@ -10,3 +10,7 @@ class Battery():
     def add_house(self, house):
         self.connected.append(house)
         self.remainder -= house.maxoutput
+
+    def delete_house(self, house):
+        self.connected.remove(house)
+        self.remainder += house.maxoutput
