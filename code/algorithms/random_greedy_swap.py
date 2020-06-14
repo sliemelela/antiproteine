@@ -1,7 +1,6 @@
 from code.classes import district, cable
 import random, copy
 
-
 # Random Algorithm 
 def generate_random_cable(house_position, battery_position):
     """ 
@@ -26,7 +25,7 @@ def generate_random_cable(house_position, battery_position):
         x = current_location[0]
         y = current_location[1]
 
-        # Possible new directions
+        # Possible new directions (such that manhatten distance is satisfied)
         if x > a and y > b:
             new_location_choices = [(x - 1, y), (x, y - 1)]
         if x > a and y < b:
@@ -88,73 +87,56 @@ def random_connect_battery(district, house):
     else:
         return False
 
-# Swapping Algorithm 
-def connect_limited_batteries(district, battery, house):
+# Swapping algorithm 
+def connect_limited_batteries(district, chosen_battery, house):
     """
-    Connect house to random battery with certain battery removed from choices
+    Connect house to random battery with certain battery removed from choices.
     """
 
-    # Loading district and batteries
-    battery_options = []
-    for battery_option in district.batteries:
-        if battery_option != battery:
-            battery_options.append(battery_option)
+    # Choosing random battery from available batteries   
+    chosen_battery.add_house(house)
 
-    # Checking which batteries can be connected
-    battery_choices = []
-    for battery_choice in battery_options:
-        if battery_choice.remainder > house.maxoutput:
-            battery_choices.append(battery_choice)
+    # Retrieving exact location of house and battery
+    house_position = house.position
+    battery_position = chosen_battery.position
 
-    # Checking if connections are possible
-    if len(battery_choices) > 0: 
+    # Generating a random cable
+    cable = generate_random_cable(house_position, battery_position)
+    
+    # Store connection.
+    district.add_cable(cable)
+    house.add_cable(cable)
 
-        # Choosing random battery from available batteries   
-        chosen_battery = random.choice(battery_choices)
-        chosen_battery.add_house(house)
-
-        # Retrieving exact location of house and battery
-        house_position = house.position
-        battery_position = chosen_battery.position
-
-        # Generating a random cable
-        cable = generate_random_cable(house_position, battery_position)
-        
-        # Store connection.
-        district.add_cable(cable)
-        house.add_cable(cable)
-
-        return True
-
-    else:
-        return False
+    return True
 
 def swap_connections(district, battery):
     """
     Swapping houses from inputted battery to random other battery.
     """
-
-    new_battery_choices = []
-    for battery_option in district.batteries:
-        if battery_option != battery:
-            new_battery_choices.append(battery_option)
-
+    
     for house in battery.connected:
-        for battery_choice in new_battery_choices:
 
-            # Check if house can connect to another battery.
-            if house.maxoutput < battery_choice.remainder:
+        # List of available batteries to choose from
+        new_battery_choices = []
+        for battery_option in district.batteries:
 
-                # Remove old connection.
-                district.delete_cable(house.cables[0])
-                house.delete_cable()
-                battery.delete_house(house)
+            # Choose a battery that is different from the one the house is now connected to 
+            if (battery_option != battery) and house.maxoutput < battery_option.remainder:
+                new_battery_choices.append(battery_option)
+        
+        if len(new_battery_choices) > 0:
 
-                # Make new random connection for house.
-                connect_limited_batteries(district, battery, house)
+            # Choosing battery with least remainder
+            battery_choice = min(new_battery_choices, key=lambda x:x.remainder)
 
-                break
+            # Remove old connection.
+            district.delete_cable(house.cables[0])
+            house.delete_cable()
+            battery.delete_house(house)
 
+            # Make new random connection for house.
+            connect_limited_batteries(district, battery_choice, house)
+    
     return True
 
 def swap_connects(district):
