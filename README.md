@@ -91,3 +91,8 @@ for houses in (list of houses that is connected to that battery):
 ### Case 2: Location/amount of houses known; amount of batteries known
 
 ### Case 3: Location/amount of houses known
+s
+## Authors
+- Sliem el Ela
+- Sara Morcy
+- Anastasija Markovic
