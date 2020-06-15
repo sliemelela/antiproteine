@@ -32,6 +32,5 @@ if __name__ == "__main__":
         random_swap.random_connect_battery(district, house)
     print(len(no_connections))
     
-
     ##CONCLUSION: Just swapping from biggest remainder to another random battery does not help!
     ## Need to choose to which battery we should swap! (next optimization step)
