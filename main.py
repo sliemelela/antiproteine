@@ -1,5 +1,6 @@
 from code.classes import district as dt
 from code.algorithms import randomize, random_swap, random_greedy_swap, greedy
+from code.visualisation import visualise as vis
 
 
 if __name__ == "__main__":
@@ -19,6 +20,8 @@ if __name__ == "__main__":
             print("SUCCES")
             break
 
+    # Visualisation
+    vis.visualise(district)
 
     #########################################################################
     # # Retrieving district information
@@ -63,3 +66,4 @@ if __name__ == "__main__":
 
     #     if len(district.cables) == 150:
     #         satisfactory = True
+
