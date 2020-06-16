@@ -7,6 +7,7 @@ class District():
         self.houses = self.load_houses(f"data/{name}/{name}_houses.csv")
         self.batteries = self.load_batteries(f"data/{name}/{name}_batteries.csv")
         self.cables = []
+        self.total_cost = 5*5000
 
     def load_houses(self, source_file):
         """
@@ -40,6 +41,7 @@ class District():
     
     def add_cable(self, cable):
         self.cables.append(cable)
+        self.total_cost += cable.total_cost
 
     def delete_cable(self, cable):
         self.cables.remove(cable)
