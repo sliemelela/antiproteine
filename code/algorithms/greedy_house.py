@@ -2,7 +2,7 @@ import copy, random
 from ..classes import cable
 
 
-class Greedy():
+class GreedyHouse():
     """
     This algorithm connects every house to the battery with the shortest
     manhatten distance to the house that is available.
@@ -99,7 +99,7 @@ class Greedy():
                 no_connection.append(house)
         return [no_connection, self.district.total_cost]
 
-class SwapGreedy(Greedy):
+class SwapGreedyHouse(GreedyHouse):
     def __init__(self, district):
         self.district = district
     
@@ -162,7 +162,8 @@ class SwapGreedy(Greedy):
     
     def run_swap(self):
         houses = self.district.houses
-        random.shuffle(houses)
+        #houses.sort(key=lambda x:x.maxoutput, reverse=True)
+        #random.shuffle(houses)
         result = self.run(houses)
 
         if len(result[0]) > 0 :
@@ -174,7 +175,7 @@ class SwapGreedy(Greedy):
                     return [True, "AFTER SWAP"]
             return [False, "WITH SWAP"] 
         else:
-            return [True, "WITHOUT SWAP"]
+            return [True, "WITHOUT SWAP", f"Price: {result[1]}"]
         
 
 
