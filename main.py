@@ -1,31 +1,29 @@
 from code.classes import district as dt
-from code.algorithms import randomize, random_swap, random_greedy_swap, greedy_house, greedy_battery
+from code.algorithms import randomize, random_swap, random_greedy_swap, greedy
 from code.visualisation import visualise as vis
 
 
 if __name__ == "__main__":
 
     # Retrieving district information
-    data_folder = "district-1"
+    data_folder = "district-2"
 
     # Generating district object
     district = dt.District(data_folder)
 
-    # # Starting greedy algorithm
-    # while True:
-    #     greedy_swap_house = greedy_house.SwapGreedyHouse(district)
-    #     result = greedy_swap_house.run_swap()
-    #     print(result)
-    #     if result[0] == True:
-    #         print("SUCCES")
-    #         break
-    
-    # Starting greedy battery algorithm
-    greedy_batt = greedy_battery.GreedyBattery(district)
-    result = greedy_batt.run()
+    # Starting greedy algorithm WITH SWAP and battery queue
+    greedy_swap = greedy.SwapGreedy(district)
+    result = greedy_swap.run_battery_swap()
     print(result)
     if result[0] == True:
         print("SUCCES")
+    
+    # # Starting greedy algorithm WITH SWAP house queue
+    # greedy_swap = greedy.SwapGreedy(district)
+    # result = greedy_swap.run_houses_swap()
+    # print(result)
+    # if result[0] == True:
+    #     print("SUCCES")
 
     # Visualisation
     vis.visualise(district)
