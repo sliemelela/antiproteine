@@ -5,19 +5,53 @@ from ..classes import cable
 class Greedy():
     """
     This algorithm connects every house to the battery with the shortest
-    manhatten distance to the house that is available. This algorithm
-    does that in two different ways. One is by putting the houses in a 
-    queue to connect and the other is by putting the batteries in a queue
-    to fill up with connections to houses that are nearby.
+    manhatten distance to the house that is available. 
+    This algorithm does that in two different ways. 
+    - One is by putting the houses in a queue to connect 
+    - The other is by putting the batteries in a queue
+        to fill up with connections to houses that are nearby.
     """
 
-    def __init__(self, district):
+    def __init__(self, district, w1, w2):
         self.district = copy.deepcopy(district)
+        self.w1 = w1
+        self.w2 = w2 
 
-    def find_battery(self, house):
+    def house_score(self, house, battery):
+        """ 
+        Given a battery, this method assigns a score to a house.
+        This score is determined by the manhatten distance and the output of the house.
+        The lower the score, the better. 
+        """
 
+        # Retrieving coordinates of house and battery
         h_x = house.position[0]
         h_y = house.position[1]
+        b_x = battery.position[0]
+        b_y = battery.position[1]
+
+        # Calculating manhatten distance
+        manhatten_distance = abs(h_x - b_x) + abs(h_y - b_y)
+
+        # Retrieving house max output
+        output = house.maxoutput
+
+        # Scoring the house by distance and output
+        score = self.w1 * manhatten_distance + self.w2 * output 
+
+        return score 
+    
+    def find_battery(self, house):
+        """
+        Given a house, this method searches for the closest battery 
+        with respect to the manhatten distance.
+        """
+
+        # Retrieving house position
+        h_x = house.position[0]
+        h_y = house.position[1]
+
+        # Declaring a list of all possible manhatten distances per battery
         manhatten_distances = {}
         
         # Make list of all batteries that the house can be connected to
@@ -41,16 +75,16 @@ class Greedy():
         return False
 
     def find_houses(self, battery):
-
-        # Get battery coordinates
-        b_x = battery.position[0]
-        b_y = battery.position[1]
-
+        """
+        Given a battery, this method searches for all the houses that it can connect to.
+        The houses are sorted in ascending order with respect to the manhatten distance.
+        """
         # Make list of eligible houses (no connections)
         houses = [house for house in self.district.houses if len(house.cables) == 0]
     
         # Sorting house by manhatten distance to the battery
-        houses.sort(key=lambda house:abs(house.position[0] - b_x) + abs(house.position[1] - b_y))
+        houses.sort(key=lambda house:self.house_score(house, battery))
+        
         
         # Only return list in order of distance with distance lower than 50
         # for house in houses:
@@ -109,6 +143,7 @@ class Greedy():
         """
         This function saves the connection between battery and house with the inputted cable.
         """
+
         house.add_cable(cable)
         self.district.add_cable(cable)
         battery.add_house(house)
@@ -119,6 +154,7 @@ class Greedy():
         This function runs the greedy algorithm with houses (the inputted list of houses) in the queue and returns
         the total price with the list of houses that were not connected.
         """
+
         no_connection = []
         for house in houses:
             battery = self.find_battery(house)
@@ -134,28 +170,30 @@ class Greedy():
         This function runs the greedy algorithm with batteries in the queue and returns
         the total price with the list of houses that were not connected.
         """
+
         for battery in self.district.batteries:
             houses = self.find_houses(battery)
 
             # First add the shorter distance houses until not possible anymore
-            while houses[0].maxoutput < battery.remainder:
-                house = houses[0]
-                cable = self.generate_random_cable(house, battery)
-                self.connect_house(house, battery, cable)
-                houses.pop(0)
-            
-            # Add the farther houses in the list 
-            no_connections = []
-            for house in houses:
-                if house.maxoutput < battery.remainder and len(house.cables) == 0:
+            if len(houses) > 0:
+                while houses[0].maxoutput < battery.remainder:
+                    house = houses[0]
                     cable = self.generate_random_cable(house, battery)
                     self.connect_house(house, battery, cable)
-                else:
-                    no_connections.append(house)
+                    houses.pop(0)
+                    if len(houses) == 0:
+                        break 
+            
+                # Add the farther houses in the list 
+                no_connections = []
+                for house in houses:
+                    if house.maxoutput < battery.remainder and len(house.cables) == 0:
+                        cable = self.generate_random_cable(house, battery)
+                        self.connect_house(house, battery, cable)
+                    else:
+                        no_connections.append(house)
         
-
         return [no_connections, self.district.total_cost]
-
 
 class SwapGreedy(Greedy):
     """
@@ -163,8 +201,6 @@ class SwapGreedy(Greedy):
     the result was of the greedy algorithm was not successfull. Even after swapping,
     the result can still be unsuccessfull.
     """
-    def __init__(self, district):
-        self.district = district
     
     def find_battery_to_empty(self):
         """
@@ -195,6 +231,7 @@ class SwapGreedy(Greedy):
         """
         This function removes the connection between inputted battery and house.
         """
+
         self.district.delete_cable(house.cables[0])
         house.delete_cable()
         battery.delete_house(house)
@@ -235,19 +272,20 @@ class SwapGreedy(Greedy):
     def run_houses_swap(self):
         """
         This function runs the greedy algorithm with houses in the queue and tries swapping 
-        (if the result was not succesfull) afterward.
+        (if the result was not successfull) afterward.
         """
+
         houses = self.district.houses
 
         # Sorting the houses by their maxoutput
-        #houses.sort(key=lambda x:x.maxoutput, reverse=True)
+        houses.sort(key=lambda x:x.maxoutput, reverse=True)
         #random.shuffle(houses)
 
         # Run the greedy algorithm with houses in the queue
         result = self.run_houses(houses)
 
         # If some houses were not connected, try swapping
-        if len(result[0]) > 0 :
+        if len(result[0]) > 0:
 
             # Sort the batteries from biggest to smallest remainder
             batteries = self.order_batteries()
@@ -267,7 +305,7 @@ class SwapGreedy(Greedy):
     def run_battery_swap(self):
         """
         This function runs the greedy algorithm with batteries in the queue and tries swapping 
-        (if the result was not succesfull) afterward.
+        (if the result was not successfull) afterward.
         """
 
         # Run the greedy algorithm with batteries in the queue
@@ -287,15 +325,16 @@ class SwapGreedy(Greedy):
 
                 # If swapping worked, stop and return the result
                 if len(new_result[0]) == 0:
-                    return [True, "AFTER SWAP", f"Price: {new_result[1]}"]
+                    return {"success": True, "swap": "AFTER SWAP", "district": self.district, "total_cost": result[1]}
             
             # If swapping for all batteries did not work, return False
-            return [False, "WITH SWAP"] 
+            return {"success": False, "swap": "WITH SWAP"}
         
         # If all houses are connected, return the result
         else:
-            return [True, "WITHOUT SWAP", f"Price: {result[1]}"]
+            return {"success": True, "swap": "WITHOUT SWAP", "district": self.district, "total_cost": result[1]}
         
+
 
 
 

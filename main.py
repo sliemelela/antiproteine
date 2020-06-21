@@ -1,22 +1,26 @@
 from code.classes import district as dt
-from code.algorithms import randomize, random_swap, random_greedy_swap, greedy
+from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, simulated_annealing
 from code.visualisation import visualise as vis
 
 
 if __name__ == "__main__":
 
     # Retrieving district information
-    data_folder = "district-2"
+    data_folder = "district-3"
 
     # Generating district object
     district = dt.District(data_folder)
 
-    # Starting greedy algorithm WITH SWAP and battery queue
-    greedy_swap = greedy.SwapGreedy(district)
-    result = greedy_swap.run_battery_swap()
-    print(result)
-    if result[0] == True:
-        print("SUCCES")
+    # Simulated annealing test 
+    sim = simulated_annealing.Annealing(district)
+    result = sim.run_annealing()
+
+    # # Starting greedy algorithm WITH SWAP and battery queue
+    # greedy_swap = greedy.SwapGreedy(district, 8, 2)
+    # result = greedy_swap.run_battery_swap()
+    # print(result)
+    # if result["success"] == True:
+    #     print("SUCCES")
     
     # # Starting greedy algorithm WITH SWAP house queue
     # greedy_swap = greedy.SwapGreedy(district)
@@ -25,12 +29,9 @@ if __name__ == "__main__":
     # if result[0] == True:
     #     print("SUCCES")
 
-    # Visualisation
-    vis.visualise(district)
-
     #########################################################################
     # # Retrieving district information
-    # data_folder = "district-3"
+    # data_folder = "district-2"
 
     # # Trying random algorithm until solution is found
     # satisfactory = False
@@ -72,3 +73,5 @@ if __name__ == "__main__":
     #     if len(district.cables) == 150:
     #         satisfactory = True
 
+    # Visualisation
+    vis.visualise(result["district"])
