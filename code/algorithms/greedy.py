@@ -155,22 +155,26 @@ class Greedy():
         the total price with the list of houses that were not connected.
         """
 
-        no_connection = []
+        success = False 
+        no_connections = []
         for house in houses:
             battery = self.find_battery(house)
             if battery != False:
                 cable = self.generate_random_cable(house, battery)
                 self.connect_house(house, battery, cable)
             else:
-                no_connection.append(house)
-        return [no_connection, self.district.total_cost]
+                no_connections.append(house)
+
+        if len(no_connections) == 0:
+            success = True
+        return {"no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
 
     def run_battery(self):
         """
         This function runs the greedy algorithm with batteries in the queue and returns
         the total price with the list of houses that were not connected.
         """
-
+        success = False 
         for battery in self.district.batteries:
             houses = self.find_houses(battery)
 
@@ -192,8 +196,11 @@ class Greedy():
                         self.connect_house(house, battery, cable)
                     else:
                         no_connections.append(house)
-        
-        return [no_connections, self.district.total_cost]
+
+            if len(no_connections) == 0:
+                success = True
+
+        return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
 
 class SwapGreedy(Greedy):
     """
@@ -285,7 +292,7 @@ class SwapGreedy(Greedy):
         result = self.run_houses(houses)
 
         # If some houses were not connected, try swapping
-        if len(result[0]) > 0:
+        if len(result["no_connections"]) > 0:
 
             # Sort the batteries from biggest to smallest remainder
             batteries = self.order_batteries()
@@ -293,14 +300,14 @@ class SwapGreedy(Greedy):
             # Per battery try swapping, if it worked stop.
             for battery in batteries:
                 self.swap_houses(battery)
-                new_result = self.run_houses(result[0])
-                if len(new_result[0]) == 0:
-                    return [True, "AFTER SWAP", f"Price: {new_result[1]}"]
-            return [False, "WITH SWAP"] 
+                new_result = self.run_houses(result["no_connections"])
+                if len(new_result["no_connections"]) == 0:
+                    return {"success": True, "swap": "WITH SWAP", "district": self.district}
+            return {"success": False, "swap": "WITH SWAP", "district": self.district}
         
         # If all houses were connected, just return the result.
         else:
-            return [True, "WITHOUT SWAP", f"Price: {result[1]}"]
+            return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
     
     def run_battery_swap(self):
         """
@@ -312,7 +319,7 @@ class SwapGreedy(Greedy):
         result = self.run_battery()
         
         # If there are houses not connected, try swapping
-        if len(result[0]) > 0 :
+        if len(result["no_connections"]) > 0 :
             batteries = self.order_batteries()
 
             for battery in batteries:
@@ -321,18 +328,18 @@ class SwapGreedy(Greedy):
                 self.swap_houses(battery)
                 
                 # Try connecting the houses again that were not connected yet
-                new_result = self.run_houses(result[0])
+                new_result = self.run_houses(result["no_connections"])
 
                 # If swapping worked, stop and return the result
-                if len(new_result[0]) == 0:
-                    return {"success": True, "swap": "AFTER SWAP", "district": self.district, "total_cost": result[1]}
+                if len(new_result["no_connections"]) == 0:
+                    return {"success": True, "swap": "AFTER SWAP", "district": self.district}
             
             # If swapping for all batteries did not work, return False
             return {"success": False, "swap": "WITH SWAP"}
         
         # If all houses are connected, return the result
         else:
-            return {"success": True, "swap": "WITHOUT SWAP", "district": self.district, "total_cost": result[1]}
+            return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
         
 
 

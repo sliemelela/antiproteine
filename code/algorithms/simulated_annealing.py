@@ -84,7 +84,7 @@ class Annealing(greedy.SwapGreedy):
             if new_result["success"]:
 
                 # Checking if we accept the new solution 
-                if random.random() > self.acceptence_prob(score_old=result["total_cost"], score_new=new_result["total_cost"], temp=temp):
+                if random.random() > self.acceptence_prob(score_old=result["district"].total_cost, score_new=new_result["district"].total_cost, temp=temp):
                     self.w1 = old_w1
                     self.w2 = old_w2 
                     self.district = old_district
