@@ -1,13 +1,12 @@
 # Smart Grid (by Antiproteine)
 
-Green energy is the energy of the future, and producing it yourself is todays fasion. Presently, a lot of houses have solar pannel or windmill, or other installations that produce their own energy. 
-Fortunately, often we have that those installations produce more energy than is actually needed for a user their own consumption. The surplus could be sold back to the supplier, but the infrastructure (the grid) is often not designed for this. 
-Batteries must be installed to manage the peaks in consumption and production. 
+Green energy is the energy of the future, and producing it yourself is today's fashion. Presently, many houses have solar pannels or windmills, or other installations that produce their own energy. Fortunately, these installations often produce more energy than is actually needed for a user's own consumption. The surplus could be sold back to the supplier, but the infrastructure (the grid) is often not designed for this. Batteries must be installed to manage the peaks in consumption and production. 
 
 The challenge is to find a configuration of cables and batteries that is the cheapest, since cables (between houses and batteries) and batteries cost money. There are also some constraints we need to look out for:
+
 - The maximum output of the houses counted up may not exceed the battery capacity
 - Batteries should not be connected to each other, also not through a house. 
-- A house should not be connected to more than one batteries.
+- A house should not be connected to more than one battery.
 - Cables can be positioned over the same grid segment. If cables are positioned over the same grid segment, then the price can be discounted. For all intents and purposes, we can pretend there is only one cable on that particular grid segment with respect to the total cost.
 - Each house needs to have a unique cable that is connected to a battery.
 
@@ -36,7 +35,7 @@ An example can be run by calling:
 The file provides an example for the use of the various functions used in this project.
 
 ### Structure
-De hierop volgende lijst beschrijft de belangrijkste mappen en files in het project, en waar je ze kan vinden:
+The following list describes the most important maps and file in the project, and where you can find them:
 
 - /code: contains all the code used for this project
     - /code/algorithms: contains the code for the algorithms
