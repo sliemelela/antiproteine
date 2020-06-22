@@ -1,6 +1,6 @@
 import copy, random
 from ..classes import cable
-
+from ..classes import district as dt
 
 class Greedy():
     """
@@ -276,7 +276,7 @@ class SwapGreedy(Greedy):
     
         return True
     
-    def run_houses_swap(self):
+    def run_houses_swap_choice(self, choice):
         """
         This function runs the greedy algorithm with houses in the queue and tries swapping 
         (if the result was not successfull) afterward.
@@ -284,9 +284,11 @@ class SwapGreedy(Greedy):
 
         houses = self.district.houses
 
-        # Sorting the houses by their maxoutput
-        houses.sort(key=lambda x:x.maxoutput, reverse=True)
-        #random.shuffle(houses)
+        # Sorting the houses by their choice (by output or random)
+        if choice == "random":
+            random.shuffle(houses)
+        elif choice == "output":
+            houses.sort(key=lambda x:x.maxoutput, reverse=True)
 
         # Run the greedy algorithm with houses in the queue
         result = self.run_houses(houses)
@@ -308,7 +310,28 @@ class SwapGreedy(Greedy):
         # If all houses were connected, just return the result.
         else:
             return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
-    
+
+
+    def reset_district(self):
+        """
+        Creating the same district again, which effectively
+        resets the district.
+        """
+        
+        # Resetting district properties
+        self.district = dt.District(self.district.name)
+
+    def run_houses_swap(self):
+        success = False
+        while success == False:
+            result = self.run_houses_swap_choice("random")
+            success = result["success"]
+            if success == False:
+                self.reset_district()
+        
+        return result
+
+
     def run_battery_swap(self):
         """
         This function runs the greedy algorithm with batteries in the queue and tries swapping 

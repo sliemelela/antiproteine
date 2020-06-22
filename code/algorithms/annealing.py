@@ -1,5 +1,4 @@
 from ..algorithms import greedy 
-from ..classes import district as dt
 
 import random 
 import math
@@ -20,15 +19,6 @@ class Annealing(greedy.SwapGreedy):
         probability = math.exp((score_old - score_new) / temp)
 
         return probability
-
-    def reset_district(self):
-        """
-        Creating the same district again, which effectively
-        resets the district.
-        """
-        
-        # Resetting district properties
-        self.district = copy.deepcopy(dt.District(self.district.name))
 
     def random_solution(self):
         """
@@ -63,12 +53,12 @@ class Annealing(greedy.SwapGreedy):
         result = self.random_solution()
         temp = 2000
 
-        for iteration in range(1000):
+        for iteration in range(500):
 
             # Keeping track of old district configuration
-            old_district = self.district
-            old_w1 = self.w1
-            old_w2 = self.w2
+            old_district = copy.deepcopy(self.district)
+            old_w1 = copy.deepcopy(self.w1)
+            old_w2 = copy.deepcopy(self.w2)
             
             # Little random change
             self.w1 += random.uniform(-0.04, 0.04)
@@ -85,14 +75,14 @@ class Annealing(greedy.SwapGreedy):
 
                 # Checking if we accept the new solution 
                 if random.random() > self.acceptence_prob(score_old=result["district"].total_cost, score_new=new_result["district"].total_cost, temp=temp):
-                    self.w1 = old_w1
-                    self.w2 = old_w2 
                     self.district = old_district
                 else:
+                    self.w1 = old_w1
+                    self.w2 = old_w2 
                     result = new_result
             else:
                 self.w1 = old_w1
-                self.w2 = old_w2 
+                self.w2 = old_w2
                 self.district = old_district
 
             # Decreasing the temperature

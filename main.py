@@ -1,6 +1,6 @@
 from __future__ import print_function, unicode_literals
 from code.classes import district as dt
-from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, simulated_annealing
+from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, annealing
 from code.visualisation import visualise as vis
 
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
             # Simulated Annealing 
             if annealing_answers["annealing"]:
-                sim = simulated_annealing.Annealing(district)
+                sim = annealing.Annealing(district)
                 result = sim.run_annealing()
 
             # No simulated annealing
