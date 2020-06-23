@@ -1,6 +1,6 @@
 from __future__ import print_function, unicode_literals
 from code.classes import district as dt
-from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, annealing
+from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, annealing, random
 from code.visualisation import visualise as vis
 
 
@@ -116,6 +116,13 @@ if __name__ == "__main__":
     if algo_answers["algorithm"] == "Random":
         swap_answers = prompt(swap_type, style=style)
 
+        # With Swap
+        if swap_answers["swap"]:
+            raise "Not implemented"
+        else:
+            random = random.Random(district)
+            result = random.run_random(district.houses)
+
     # Greedy algorithms
     elif algo_answers["algorithm"] == "Greedy":
         greedy_answers = prompt(greedy_type, style=style)
@@ -148,7 +155,7 @@ if __name__ == "__main__":
 
     # Clustering algorithms
     # TODO
-    
+
     # Table overview of results
     x.add_column("District", [result["district"].name])
     x.add_column("Success", [result["success"]])
