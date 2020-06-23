@@ -1,6 +1,6 @@
 from __future__ import print_function, unicode_literals
 from code.classes import district as dt
-from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, annealing, random
+from code.algorithms import randomize, greedy, annealing, random, cluster
 from code.visualisation import visualise as vis
 
 
@@ -101,6 +101,15 @@ if __name__ == "__main__":
         }
     ]
 
+    repeating_type = [
+        {
+            'type': 'confirm',
+            'message': 'Do you want to repeat the random swapping algorithm until a solution is found?',
+            'name': 'repeat',
+            'default': True,
+        }
+    ]
+
     x = PrettyTable()
 
     # Retrieving the desired district
@@ -109,18 +118,25 @@ if __name__ == "__main__":
     # Generating district object
     data_folder = district_answers["district"].replace(' ', '-')
     district = dt.District(data_folder)
-
+    
+    # Prompting users with which algorithm they want to pick
     algo_answers = prompt(algo_type, style=style)
 
     # Random algoritms 
     if algo_answers["algorithm"] == "Random":
+        random = random.Random(district)
         swap_answers = prompt(swap_type, style=style)
 
         # With Swap
         if swap_answers["swap"]:
-            raise "Not implemented"
+            repeat_answer = prompt(repeating_type, style=style)
+            if repeat_answer["repeat"]:
+                result = random.run()
+            else:
+                result = random.run_random_swap()
+
+        # Without Swap 
         else:
-            random = random.Random(district)
             result = random.run_random(district.houses)
 
     # Greedy algorithms
@@ -154,58 +170,17 @@ if __name__ == "__main__":
             result = greedy_swap.run_houses_swap()
 
     # Clustering algorithms
-    # TODO
+    else:
+        clust = cluster.Cluster(district)
+        result = clust.run_cluster()
 
     # Table overview of results
     x.add_column("District", [result["district"].name])
     x.add_column("Success", [result["success"]])
     x.add_column("Total Cost", [result["district"].total_cost])
+    x.add_column("Discounted Cost", [result["district"].discounted_cost])
 
     print(x)
-
-    #########################################################################
-    # # Retrieving district information
-    # data_folder = "district-2"
-
-    # # Trying random algorithm until solution is found
-    # satisfactory = False
-    # while satisfactory == False:
-
-    #     # Generating district object
-    #     district = dt.District(data_folder)
-
-    #     # Generate random configuration in state space
-    #     no_connections = []
-    #     for house in district.houses:
-    #         if random_greedy_swap.random_connect_battery(district, house) is False:
-    #             no_connections.append(house)
-
-    #     # Checking if swapping was done correctly
-    #     print("NO SWAP")
-    #     for battery in district.batteries:
-    #         print("connected: ", len(battery.connected))
-    #         print("remainder: ", battery.remainder)
-
-    #     # Check amount of cables
-    #     print("Amount of cables", len(district.cables))
-
-    #     # Swapping houses from biggest remainder battery to other random batteries
-    #     random_greedy_swap.swap_connects(district)
-
-    #     # Attempt connecting houses again (that were not conected)
-    #     for house in no_connections:
-    #         random_greedy_swap.random_connect_battery(district, house)
-
-    #     # Checking if swapping was done correctly
-    #     print("AFTER SWAP")
-    #     for battery in district.batteries:
-    #         print("connected: ", len(battery.connected))
-    #         print("remainder: ", battery.remainder)
-    #     print("Amount of cables", len(district.cables))
-    #     print("Total Cost", district.total_cost)
-
-    #     if len(district.cables) == 150:
-    #         satisfactory = True
 
     # Visualisation
     vis.visualise(result["district"])

@@ -105,14 +105,17 @@ class Random:
             if connected == False:
                 no_connections.append(house)
         
-        # If some houses have no connection from the given houses, we have no succes
+        # If some houses have no connection from the given houses, we have no success
         if len(no_connections) > 0:
             success = False
-        # If all houses have a connection from the given houses, we have succes.
+
+        # If all houses have a connection from the given houses, we have success
         else:
             success = True
 
+        self.district.calculate_price()
         return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
+    
  
     def connect_limited_batteries(self, battery, house):
         """
@@ -201,17 +204,18 @@ class Random:
     def run_random_swap(self):
         """
         This function first randomly tries to connect all houses from the ddistrict to a battery.
-        If there is no succes, swapping starts. Houses from a battery get moved to another battery of possible.
+        If there is no success, swapping starts. Houses from a battery get moved to another battery of possible.
         After swapping, we try connecting the leftover houses randomly to available batteries.
-        If swapping for all batteries did not work, we have no succes.
+        If swapping for all batteries did not work, we have no success.
         """
         
         # Randomly connect all houses in district
         result = self.run_random(self.district.houses)
 
         # If all houses are connected we stop and return the result
-        if result["succes"]:
+        if result["success"]:
             result["swap"] = False
+            self.district.calculate_price()
             return result
         
         # If some houses were not connected we try swapping
@@ -223,16 +227,27 @@ class Random:
                 new_result = self.run_random(result["no_connections"])
 
                 # If all houses are connected we stop and return the result
-                if new_result["succes"]:
+                if new_result["success"]:
                     new_result["swap"] = True
+                    self.district.calculate_price()
                     return new_result
                 
                 # If not all houses are connected yet, we try swapping with the new_result
                 result = new_result
             
-            # If not all houses are connected after swapping at every battery, we have no succes
+            # If not all houses are connected after swapping at every battery, we have no success
             new_result["swap"] = True 
+            self.district.calculate_price()
             return new_result
 
+    def run(self):
+        """
+        This function runs the random swap algorithm until a solution is 
+        """
+
+        while True:
+            result = self.run_random_swap()
+            if result["success"]:
+                return result
 
     
