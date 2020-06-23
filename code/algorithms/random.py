@@ -67,29 +67,27 @@ class Random:
         for battery_choice in battery_options:
             if battery_choice.remainder > house.maxoutput:
                 battery_choices.append(battery_choice)
-
+        
         # Checking if connections are possible
-        if len(battery_choices) > 0: 
-
-            # Choosing random battery from available batteries   
-            chosen_battery = random.choice(battery_choices)
-            chosen_battery.add_house(house)
-
-            # Retrieving exact location of house and battery
-            house_position = house.position
-            battery_position = chosen_battery.position
-
-            # Generating a random cable
-            cable = self.generate_random_cable(house_position, battery_position)
-            
-            # Storing connection
-            house.add_cable(cable)
-            self.district.add_cable(cable)
-
-            return True
-
-        else:
+        if len(battery_choices) == 0:
             return False
+
+        # Choosing random battery from available batteries   
+        chosen_battery = random.choice(battery_choices)
+        chosen_battery.add_house(house)
+
+        # Retrieving exact location of house and battery
+        house_position = house.position
+        battery_position = chosen_battery.position
+
+        # Generating a random cable
+        cable = self.generate_random_cable(house_position, battery_position)
+        
+        # Storing connection
+        house.add_cable(cable)
+        self.district.add_cable(cable)
+
+        return True
 
     def run_random(self, houses):
         """
@@ -113,6 +111,7 @@ class Random:
         else:
             success = True
 
+        # Calculate the price after configuration is made 
         self.district.calculate_price()
         return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
     
@@ -135,27 +134,25 @@ class Random:
                 battery_choices.append(battery_choice)
 
         # Checking if connections are possible
-        if len(battery_choices) > 0: 
-
-            # Choosing random battery from available batteries   
-            chosen_battery = random.choice(battery_choices)
-            chosen_battery.add_house(house)
-
-            # Retrieving exact location of house and battery
-            house_position = house.position
-            battery_position = chosen_battery.position
-
-            # Generating a random cable
-            cable = self.generate_random_cable(house_position, battery_position)
-            
-            # Store connection.
-            self.district.add_cable(cable)
-            house.add_cable(cable)
-
-            return True
-
-        else:
+        if len(battery_choices) == 0: 
             return False
+        
+        # Choosing random battery from available batteries   
+        chosen_battery = random.choice(battery_choices)
+        chosen_battery.add_house(house)
+
+        # Retrieving exact location of house and battery
+        house_position = house.position
+        battery_position = chosen_battery.position
+
+        # Generating a random cable
+        cable = self.generate_random_cable(house_position, battery_position)
+        
+        # Store connection.
+        self.district.add_cable(cable)
+        house.add_cable(cable)
+
+        return True          
 
     def swap_connections(self, battery):
         """
@@ -215,30 +212,33 @@ class Random:
         # If all houses are connected we stop and return the result
         if result["success"]:
             result["swap"] = False
+
+            # Calculate the price after configuration is made 
             self.district.calculate_price()
             return result
-        
-        # If some houses were not connected we try swapping
-        else:
 
-            # We try swapping per battery and try connecting afterwards again
-            for battery in self.district.batteries:
-                self.swap_connections(battery)
-                new_result = self.run_random(result["no_connections"])
+        # We try swapping per battery and try connecting afterwards again
+        for battery in self.district.batteries:
+            self.swap_connections(battery)
+            new_result = self.run_random(result["no_connections"])
 
-                # If all houses are connected we stop and return the result
-                if new_result["success"]:
-                    new_result["swap"] = True
-                    self.district.calculate_price()
-                    return new_result
-                
-                # If not all houses are connected yet, we try swapping with the new_result
-                result = new_result
+            # If all houses are connected we stop and return the result
+            if new_result["success"]:
+                new_result["swap"] = True
+
+                # Calculate the price after configuration is made 
+                self.district.calculate_price()
+                return new_result
             
-            # If not all houses are connected after swapping at every battery, we have no success
-            new_result["swap"] = True 
-            self.district.calculate_price()
-            return new_result
+            # If not all houses are connected yet, we try swapping with the new_result
+            result = new_result
+        
+        # If not all houses are connected after swapping at every battery, we have no success
+        new_result["swap"] = True 
+
+        # Calculate the price after configuration is made 
+        self.district.calculate_price()
+        return new_result
 
     def run(self):
         """
