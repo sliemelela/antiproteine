@@ -167,6 +167,9 @@ class Greedy():
 
         if len(no_connections) == 0:
             success = True
+
+        self.district.calculate_price()
+
         return {"no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
 
     def run_battery(self):
@@ -199,6 +202,8 @@ class Greedy():
 
             if len(no_connections) == 0:
                 success = True
+
+        self.district.calculate_price()
 
         return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
 
@@ -304,11 +309,14 @@ class SwapGreedy(Greedy):
                 self.swap_houses(battery)
                 new_result = self.run_houses(result["no_connections"])
                 if len(new_result["no_connections"]) == 0:
+                    self.district.calculate_price()
                     return {"success": True, "swap": "WITH SWAP", "district": self.district}
+            self.district.calculate_price()
             return {"success": False, "swap": "WITH SWAP", "district": self.district}
         
         # If all houses were connected, just return the result.
         else:
+            self.district.calculate_price()
             return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
 
 
@@ -355,13 +363,16 @@ class SwapGreedy(Greedy):
 
                 # If swapping worked, stop and return the result
                 if len(new_result["no_connections"]) == 0:
+                    self.district.calculate_price()
                     return {"success": True, "swap": "AFTER SWAP", "district": self.district}
             
             # If swapping for all batteries did not work, return False
+            self.district.calculate_price()
             return {"success": False, "swap": "WITH SWAP"}
         
         # If all houses are connected, return the result
         else:
+            self.district.calculate_price()
             return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
         
 

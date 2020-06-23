@@ -1,5 +1,6 @@
 from ..algorithms import annealing
 from ..classes import district as dt
+import random
 
 class Cluster(annealing.Annealing):
     """
@@ -28,6 +29,12 @@ class Cluster(annealing.Annealing):
             mean_x = sum_x / len(battery.connected)
             mean_y = sum_y / len(battery.connected)
             new_battery_positions.append((int(mean_x), int(mean_y))) 
+        
+        house_coordinates = [house.position for house in solution["district"].houses]
+        for new_battery_position in new_battery_positions:
+            while new_battery_position in house_coordinates:
+                print("Damn")
+                new_battery_position = (new_battery_position[0] + random.choice([-1,0, 1]) , new_battery_position[1] + random.choice([-1,0, 1]))
         
         # Repeat procedure until new solution has lower total cost
         iterations = 0
@@ -59,6 +66,7 @@ class Cluster(annealing.Annealing):
         This is done by imposing a threshold (called epsilon) for which if the difference is smaller, we 
         consider the last configuration as "converged".
         """
+        
         # Make initial solution
         init_solution = self.run_houses_swap()
 

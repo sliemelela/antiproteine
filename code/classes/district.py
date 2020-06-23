@@ -7,7 +7,8 @@ class District():
         self.houses = self.load_houses(f"data/{name}/{name}_houses.csv")
         self.batteries = self.load_batteries(f"data/{name}/{name}_batteries.csv")
         self.cables = []
-        self.total_cost = 5*5000
+        self.total_cost = 0
+        self.discounted_cost = 0
 
     def load_houses(self, source_file):
         """
@@ -46,3 +47,20 @@ class District():
     def delete_cable(self, cable):
         self.cables.remove(cable)
 
+    def calculate_price(self):
+
+        # Keep track of amount of cables line segments 
+        amount_cable_lines = 0
+
+        # Keep track of actual cable lines, but delete duplicates (shared cable implementation) 
+        shared_cables = set()
+        
+        # Add line segment to cable and update the information about cables
+        for cable in self.cables:
+            cable.add_lines()
+            shared_cables.update(cable.lines)
+            amount_cable_lines += len(cable.lines)
+        
+        # Calculate total cost and discounted cost
+        self.total_cost = 5 * 5000 +  9 * amount_cable_lines 
+        self.discounted_cost = 5 * 5000 + 9 * len(shared_cables)

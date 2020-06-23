@@ -156,20 +156,6 @@ if __name__ == "__main__":
 
     print(x)
 
-    # # Starting greedy algorithm WITH SWAP and battery queue
-    # greedy_swap = greedy.SwapGreedy(district, 8, 2)
-    # result = greedy_swap.run_battery_swap()
-    # print(result)
-    # if result["success"] == True:
-    #     print("SUCCES")
-    
-    # # Starting greedy algorithm WITH SWAP house queue
-    # greedy_swap = greedy.SwapGreedy(district)
-    # result = greedy_swap.run_houses_swap()
-    # print(result)
-    # if result[0] == True:
-    #     print("SUCCES")
-
     #########################################################################
     # # Retrieving district information
     # data_folder = "district-2"
