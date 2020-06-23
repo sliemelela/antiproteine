@@ -80,7 +80,7 @@ class Random:
             battery_position = chosen_battery.position
 
             # Generating a random cable
-            cable = generate_random_cable(house_position, battery_position)
+            cable = self.generate_random_cable(house_position, battery_position)
             
             # Storing connection
             house.add_cable(cable)
@@ -107,12 +107,12 @@ class Random:
         
         # If some houses have no connection from the given houses, we have no succes
         if len(no_connections) > 0:
-            succes = False
-        
+            success = False
         # If all houses have a connection from the given houses, we have succes.
         else:
-            succes = True
-        return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost}
+            success = True
+
+        return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
  
     def connect_limited_batteries(self, battery, house):
         """
