@@ -1,28 +1,31 @@
-from code.classes import district, cable
+from code.classes import cable
+from code.classes import district as dt
+
 import random, copy
+
 
 class Random:
     def __init__(self, district):
         self.district = district
     
-    def generate_random_cable(self, house_position, battery_position):
+    def generate_random_cable(self, house, battery):
         """ 
-        Given a house and battery, this function generates a list of coordinates (in Z^3) that is supposed 
+        Given a house and battery, this function generates a list of coordinates (in Z^2) that is supposed 
         to represent the cable between the house and the battery. This function also satisfies the constraint
         that the length of the cable is the manhatten distance.
         """
 
         # Keeping track of current location
-        current_location = house_position
+        current_location = house.position
         new_cable = cable.Cable()
         new_cable.add_position(current_location)
 
         # Defining coordinates for chosen battery
-        a = battery_position[0]
-        b = battery_position[1]
+        a = battery.position[0]
+        b = battery.position[1]
 
         # Generating random manhatten walk from house to battery 
-        while current_location != battery_position:
+        while current_location != battery.position:
 
             # Defining coordinates for current location
             x = current_location[0]
@@ -46,10 +49,13 @@ class Random:
             if x == a and y < b:
                 new_location_choices = [(x, y + 1)]
             
+            # Choosing a new position 
             current_location = random.choice(new_location_choices)
+
+            # Add chosen position to the list of positions of cable
             new_cable.add_position(current_location)
 
-        return new_cable
+        return new_cable  
 
     def random_connect(self, house):
         """
@@ -76,12 +82,8 @@ class Random:
         chosen_battery = random.choice(battery_choices)
         chosen_battery.add_house(house)
 
-        # Retrieving exact location of house and battery
-        house_position = house.position
-        battery_position = chosen_battery.position
-
         # Generating a random cable
-        cable = self.generate_random_cable(house_position, battery_position)
+        cable = self.generate_random_cable(house, chosen_battery)
         
         # Storing connection
         house.add_cable(cable)
@@ -113,9 +115,9 @@ class Random:
 
         # Calculate the price after configuration is made 
         self.district.calculate_price()
+
         return {"success": success, "no_connections": no_connections, "total_cost": self.district.total_cost, "district": self.district}
     
- 
     def connect_limited_batteries(self, battery, house):
         """
         Connect house to random (available) battery other than the battery that is given.
@@ -141,18 +143,14 @@ class Random:
         chosen_battery = random.choice(battery_choices)
         chosen_battery.add_house(house)
 
-        # Retrieving exact location of house and battery
-        house_position = house.position
-        battery_position = chosen_battery.position
-
         # Generating a random cable
-        cable = self.generate_random_cable(house_position, battery_position)
+        cable = self.generate_random_cable(house, chosen_battery)
         
         # Store connection.
         self.district.add_cable(cable)
         house.add_cable(cable)
 
-        return True          
+        return None          
 
     def swap_connections(self, battery):
         """
@@ -180,23 +178,7 @@ class Random:
 
                     break
 
-        return True
-
-    def swap_connects(self):
-        """
-        Swapping houses from battery with biggest remainder. This function is not used.
-        """
-
-        # Find battery with most remainder left
-        battery_biggest_remainder = self.district.batteries[0]
-        for battery in self.district.batteries:
-            if battery.remainder > battery_biggest_remainder.remainder:
-                battery_biggest_remainder = battery
-        
-        # Increasing remainder of battery with biggest remainder
-        self.swap_connections(battery_biggest_remainder)
-        
-        return True
+        return None
 
     def run_random_swap(self):
         """
@@ -219,7 +201,11 @@ class Random:
 
         # We try swapping per battery and try connecting afterwards again
         for battery in self.district.batteries:
+
+            # Try swapping by trying to empty the inputted battery
             self.swap_connections(battery)
+
+            # Try connecting again after swapping
             new_result = self.run_random(result["no_connections"])
 
             # If all houses are connected we stop and return the result
@@ -238,7 +224,19 @@ class Random:
 
         # Calculate the price after configuration is made 
         self.district.calculate_price()
+
         return new_result
+    
+    def reset_district(self):
+        """
+        Creating the same district again, which effectively
+        resets the district.
+        """
+        
+        # Resetting district properties
+        self.district = dt.District(self.district.name)
+
+        return None
 
     def run(self):
         """
@@ -249,5 +247,8 @@ class Random:
             result = self.run_random_swap()
             if result["success"]:
                 return result
+            else:
+                self.reset_district()
+
 
     

@@ -1,14 +1,12 @@
 from __future__ import print_function, unicode_literals
 from code.classes import district as dt
-from code.algorithms import greedy, annealing, random, cluster
+from code.algorithms import greedy, annealing, randomize, cluster
 from code.visualisation import visualise as vis
-
 
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from pprint import pprint
 from pyfiglet import Figlet
 from prettytable import PrettyTable
-
 
 
 if __name__ == "__main__":
@@ -124,7 +122,7 @@ if __name__ == "__main__":
 
     # Random algoritms 
     if algo_answers["algorithm"] == "Random":
-        random = random.Random(district)
+        random = randomize.Random(district)
         swap_answers = prompt(swap_type, style=style)
 
         # With Swap
