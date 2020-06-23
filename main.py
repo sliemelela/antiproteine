@@ -1,6 +1,6 @@
 from __future__ import print_function, unicode_literals
 from code.classes import district as dt
-from code.algorithms import randomize, greedy, annealing, random, cluster
+from code.algorithms import greedy, annealing, random, cluster
 from code.visualisation import visualise as vis
 
 
