@@ -42,10 +42,9 @@ class Cluster(annealing.Annealing):
 
             # Make new district with the new battery positions (means of houses in old district)
             self.reset_district()
-            index_counter = 0
-            for battery in self.district.batteries:
-                battery.position = new_battery_positions[index_counter]
-                index_counter += 1
+            batteries_enum = enumerate(self.district.batteries)
+            for counter, battery in batteries_enum:
+                battery.position = new_battery_positions[counter]
             
             # Make a new configuration from the repositioned battery district
             new_solution = self.run_houses_swap()
@@ -66,7 +65,7 @@ class Cluster(annealing.Annealing):
         This is done by imposing a threshold (called epsilon) for which if the difference is smaller, we 
         consider the last configuration as "converged".
         """
-        
+
         # Make initial solution
         init_solution = self.run_houses_swap()
 

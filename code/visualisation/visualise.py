@@ -17,9 +17,9 @@ def visualise(district):
         relationship[battery] = battery.connected
 
     # Plotting data
-    counter = 1
+    batteries_enum = enumerate(batteries) 
     colors = ['b', 'g', 'r', 'c', 'm']
-    for battery in batteries:
+    for counter, battery in batteries_enum:
 
         # Plotting houses and cables
         for house in battery.connected:
@@ -31,9 +31,6 @@ def visualise(district):
         
         # Plotting batteries
         plt.scatter(battery.position[0], battery.position[1], c=colors[counter - 1], s=50, marker="D", label=f'Battery {counter}')
-
-        # Increasing counter for color
-        counter += 1
 
     # Put a legend to the right of the current axis
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
