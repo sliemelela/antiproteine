@@ -17,7 +17,6 @@ class Annealing(greedy.SwapGreedy):
         """
 
         probability = math.exp((score_old - score_new) / temp)
-
         return probability
 
     def random_solution(self):
@@ -36,10 +35,8 @@ class Annealing(greedy.SwapGreedy):
             result = self.run_battery_swap()
 
             if result["success"] == True:
-                print("SUCCESS!")
                 return result
             else:
-                print("Nope")
                 self.reset_district()
 
     def run_annealing(self):
@@ -87,6 +84,7 @@ class Annealing(greedy.SwapGreedy):
 
             # Decreasing the temperature
             temp -= 1
+            
         return result 
 
 

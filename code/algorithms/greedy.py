@@ -139,7 +139,7 @@ class Greedy():
         house.add_cable(cable)
         self.district.add_cable(cable)
         battery.add_house(house)
-        return True
+        return None
     
     def run_houses(self, houses):
         """
@@ -240,7 +240,7 @@ class SwapGreedy(Greedy):
         self.district.delete_cable(house.cables[0])
         house.delete_cable()
         battery.delete_house(house)
-        return True
+        return None
 
     def swap_houses(self, battery):
         """
@@ -272,7 +272,7 @@ class SwapGreedy(Greedy):
                 # Make new connection for house.
                 self.connect_house(house, battery_choice, new_cable)
     
-        return True
+        return None
     
     def run_houses_swap_choice(self, choice):
         """
@@ -291,28 +291,31 @@ class SwapGreedy(Greedy):
         # Run the greedy algorithm with houses in the queue
         result = self.run_houses(houses)
 
-        # If some houses were not connected, try swapping
-        if len(result["no_connections"]) > 0:
-
-            # Sort the batteries from biggest to smallest remainder
-            batteries = self.order_batteries()
-
-            # Per battery try swapping, if it worked stop.
-            for battery in batteries:
-                self.swap_houses(battery)
-                new_result = self.run_houses(result["no_connections"])
-                if len(new_result["no_connections"]) == 0:
-                    self.district.calculate_price()
-                    return {"success": True, "swap": True, "district": self.district}
-            
-            # If swapping did not help for all batteries, we have no success
-            self.district.calculate_price()
-            return {"success": False, "swap": True, "district": self.district}
-        
-        # If all houses were already connected, just return the result.
-        else:
+        # If all houses are connected, swapping is not needed
+        if len(result["no_connections"]) == 0:
             self.district.calculate_price()
             return {"success": True, "swap": False, "district": self.district}
+        
+        # Sort the batteries from biggest to smallest remainder
+        batteries = self.order_batteries()
+
+        # Start swapping per battery
+        for battery in batteries:
+
+            # Try swapping by emptying the inputted battery
+            self.swap_houses(battery)
+
+            # Try connecting the houses again that were not connected yet
+            new_result = self.run_houses(result["no_connections"])
+
+            # If swapping worked, stop and return the result
+            if len(new_result["no_connections"]) == 0:
+                self.district.calculate_price()
+                return {"success": True, "swap": True, "district": self.district}
+        
+        # If swapping did not help for all batteries, we have no success
+        self.district.calculate_price()
+        return {"success": False, "swap": True, "district": self.district}
 
 
     def reset_district(self):
@@ -323,12 +326,14 @@ class SwapGreedy(Greedy):
         
         # Resetting district properties
         self.district = dt.District(self.district.name)
+        return None
 
     def run_houses_swap(self):
         """
         This function repeats the houses swap procedure (run_houses_swap_choice),
         where the queue of houses is determined randomly, until a solution is found.
         """
+        
         success = False
         while success == False:
             result = self.run_houses_swap_choice("random")
@@ -340,7 +345,6 @@ class SwapGreedy(Greedy):
         
         return result
 
-
     def run_battery_swap(self):
         """
         This function runs the greedy algorithm with batteries in the queue and tries swapping 
@@ -350,31 +354,32 @@ class SwapGreedy(Greedy):
         # Run the greedy algorithm with batteries in the queue
         result = self.run_battery()
         
-        # If there are houses not connected, try swapping
-        if len(result["no_connections"]) > 0 :
-            batteries = self.order_batteries()
-
-            for battery in batteries:
-
-                # Try swapping by emptying the inputted battery
-                self.swap_houses(battery)
-                
-                # Try connecting the houses again that were not connected yet
-                new_result = self.run_houses(result["no_connections"])
-
-                # If swapping worked, stop and return the result
-                if len(new_result["no_connections"]) == 0:
-                    self.district.calculate_price()
-                    return {"success": True, "swap": "AFTER SWAP", "district": self.district}
-            
-            # If swapping for all batteries did not work, return False
-            self.district.calculate_price()
-            return {"success": False, "swap": "WITH SWAP", "district": self.district}
-        
-        # If all houses are connected, return the result
-        else:
+        # If all houses are connected, swapping is not needed
+        if len(result["no_connections"]) == 0 :
             self.district.calculate_price()
             return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
+
+        # Sort the batteries from biggest to smallest remainder
+        batteries = self.order_batteries()
+
+        # Start swapping per battery
+        for battery in batteries:
+
+            # Try swapping by emptying the inputted battery
+            self.swap_houses(battery)
+            
+            # Try connecting the houses again that were not connected yet
+            new_result = self.run_houses(result["no_connections"])
+
+            # If swapping worked, stop and return the result
+            if len(new_result["no_connections"]) == 0:
+                self.district.calculate_price()
+                return {"success": True, "swap": "AFTER SWAP", "district": self.district}
+        
+        # If swapping for all batteries did not work, return False
+        self.district.calculate_price()
+        return {"success": False, "swap": "WITH SWAP", "district": self.district}
+            
         
 
 
