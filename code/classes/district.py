@@ -1,5 +1,7 @@
 from code.classes import house, battery
+
 import csv
+
 
 class District():
     def __init__(self, name):
@@ -41,13 +43,24 @@ class District():
         return batteries
     
     def add_cable(self, cable):
+        """
+        This function adds a cable to the district.
+        """
+
         self.cables.append(cable)
         self.total_cost += cable.total_cost
 
     def delete_cable(self, cable):
+        """
+        This cable removes a cable from the district
+        """
+
         self.cables.remove(cable)
 
     def calculate_price(self):
+        """
+        This function calculates the total cost.
+        """
 
         # Keep track of amount of cables line segments 
         amount_cable_lines = 0

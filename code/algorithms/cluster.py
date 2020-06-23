@@ -1,6 +1,8 @@
 from ..algorithms import annealing
 from ..classes import district as dt
+
 import random
+
 
 class Cluster(annealing.Annealing):
     """
@@ -30,10 +32,10 @@ class Cluster(annealing.Annealing):
             mean_y = sum_y / len(battery.connected)
             new_battery_positions.append((int(mean_x), int(mean_y))) 
         
+        # Check if battery was not moved onto position of a house
         house_coordinates = [house.position for house in solution["district"].houses]
         for new_battery_position in new_battery_positions:
             while new_battery_position in house_coordinates:
-                print("Damn")
                 new_battery_position = (new_battery_position[0] + random.choice([-1,0, 1]) , new_battery_position[1] + random.choice([-1,0, 1]))
         
         # Repeat procedure until new solution has lower total cost
@@ -53,7 +55,7 @@ class Cluster(annealing.Annealing):
 
             # Stop if the amount of iterations is too high
             iterations += 1
-            if iterations >= 100:
+            if iterations >= 40:
                 new_solution = solution
                 break
 
@@ -83,15 +85,12 @@ class Cluster(annealing.Annealing):
             
             # Calculate difference in price
             difference = old_result["district"].total_cost - new_result["district"].total_cost
-            print("Difference:", difference)
 
             # Reset old result
             old_result = new_result
-            print("Price:", new_result["district"].total_cost)
 
             # Counting number of iterations
             iterations += 1
-            print("Iteration:", iterations)
 
         return new_result
 

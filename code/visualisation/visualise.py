@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 
+
 def visualise(district):
     """ 
     Visualisation code that represents the configuration of 
@@ -36,6 +37,6 @@ def visualise(district):
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.show()
 
-    return True
+    return None
     
 

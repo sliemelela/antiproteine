@@ -1,8 +1,11 @@
-import copy, random
 from ..classes import cable
 from ..classes import district as dt
+from ..algorithms import randomize
 
-class Greedy():
+import copy, random
+
+
+class Greedy(randomize.Random):
     """
     This algorithm connects every house to the battery with the shortest
     manhatten distance to the house that is available. 
@@ -83,53 +86,7 @@ class Greedy():
         # Sorting house by manhatten distance to the battery
         houses.sort(key=lambda house:self.house_score(house, battery))
         
-        return houses
-
-    def generate_random_cable(self, house, battery):
-        """ 
-        Given a house and battery, this function generates a list of coordinates (in Z^2) that is supposed 
-        to represent the cable between the house and the battery. This function also satisfies the constraint
-        that the length of the cable is the manhatten distance.
-        """
-
-        # Keeping track of current location
-        current_location = house.position
-        new_cable = cable.Cable()
-        new_cable.add_position(current_location)
-
-        # Defining coordinates for chosen battery
-        a = battery.position[0]
-        b = battery.position[1]
-
-        # Generating random manhatten walk from house to battery 
-        while current_location != battery.position:
-
-            # Defining coordinates for current location
-            x = current_location[0]
-            y = current_location[1]
-
-            # Possible new directions
-            if x > a and y > b:
-                new_location_choices = [(x - 1, y), (x, y - 1)]
-            if x > a and y < b:
-                new_location_choices = [(x - 1, y), (x, y + 1)]
-            if x > a and y == b:
-                new_location_choices = [(x - 1, y)]
-            if x < a and y > b:
-                new_location_choices = [(x + 1, y), (x, y - 1)]
-            if x < a and y < b:
-                new_location_choices = [(x + 1, y), (x, y + 1)]
-            if x < a and y == b:
-                new_location_choices = [(x + 1, y)]
-            if x == a and y > b:
-                new_location_choices = [(x, y - 1)]
-            if x == a and y < b:
-                new_location_choices = [(x, y + 1)]
-            
-            current_location = random.choice(new_location_choices)
-            new_cable.add_position(current_location)
-
-        return new_cable  
+        return houses  
 
     def connect_house(self, house, battery, cable):
         """
@@ -139,6 +96,7 @@ class Greedy():
         house.add_cable(cable)
         self.district.add_cable(cable)
         battery.add_house(house)
+
         return None
     
     def run_houses(self, houses):
@@ -198,7 +156,7 @@ class Greedy():
                     if len(houses) == 0:
                         break 
             
-                # Add the farther houses in the list 
+                # Add the farther houses in the list if possible
                 no_connections = []
                 for house in houses:
                     if house.maxoutput < battery.remainder and len(house.cables) == 0:
@@ -230,6 +188,7 @@ class SwapGreedy(Greedy):
 
         batteries = [battery for battery in self.district.batteries]
         batteries.sort(key=lambda x:x.remainder, reverse=True)
+
         return batteries
 
     def remove_connection(self, house, battery):
@@ -240,6 +199,7 @@ class SwapGreedy(Greedy):
         self.district.delete_cable(house.cables[0])
         house.delete_cable()
         battery.delete_house(house)
+
         return None
 
     def swap_houses(self, battery):
@@ -293,7 +253,11 @@ class SwapGreedy(Greedy):
 
         # If all houses are connected, swapping is not needed
         if len(result["no_connections"]) == 0:
+
+            # Calculate the price after configuration is made 
             self.district.calculate_price()
+
+            # We already have succes and give the result
             return {"success": True, "swap": False, "district": self.district}
         
         # Sort the batteries from biggest to smallest remainder
@@ -310,30 +274,25 @@ class SwapGreedy(Greedy):
 
             # If swapping worked, stop and return the result
             if len(new_result["no_connections"]) == 0:
+
+                # Calculate the price after configuration is made 
                 self.district.calculate_price()
+
+                # We have succes and give the result
                 return {"success": True, "swap": True, "district": self.district}
         
-        # If swapping did not help for all batteries, we have no success
+        # Calculate the price after configuration is made 
         self.district.calculate_price()
+
+        # If swapping did not help for all batteries, we have no success
         return {"success": False, "swap": True, "district": self.district}
-
-
-    def reset_district(self):
-        """
-        Creating the same district again, which effectively
-        resets the district.
-        """
-        
-        # Resetting district properties
-        self.district = dt.District(self.district.name)
-        return None
 
     def run_houses_swap(self):
         """
         This function repeats the houses swap procedure (run_houses_swap_choice),
         where the queue of houses is determined randomly, until a solution is found.
         """
-        
+
         success = False
         while success == False:
             result = self.run_houses_swap_choice("random")
@@ -356,8 +315,12 @@ class SwapGreedy(Greedy):
         
         # If all houses are connected, swapping is not needed
         if len(result["no_connections"]) == 0 :
+
+            # Calculate the price after configuration is made 
             self.district.calculate_price()
-            return {"success": True, "swap": "WITHOUT SWAP", "district": self.district}
+
+            # We have succes and give the result
+            return {"success": True, "swap": False, "district": self.district}
 
         # Sort the batteries from biggest to smallest remainder
         batteries = self.order_batteries()
@@ -373,12 +336,18 @@ class SwapGreedy(Greedy):
 
             # If swapping worked, stop and return the result
             if len(new_result["no_connections"]) == 0:
+
+                # Calculate the price after configuration is made
                 self.district.calculate_price()
-                return {"success": True, "swap": "AFTER SWAP", "district": self.district}
+
+                # We have succes and give the result
+                return {"success": True, "swap": True, "district": self.district}
         
-        # If swapping for all batteries did not work, return False
+        # Calculate the price after configuration is made
         self.district.calculate_price()
-        return {"success": False, "swap": "WITH SWAP", "district": self.district}
+
+        # If swapping for all batteries did not work, we have no succes
+        return {"success": False, "swap": True, "district": self.district}
             
         
 
