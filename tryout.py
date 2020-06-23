@@ -1,6 +1,5 @@
-from code.classes import district as dt
-from code.algorithms import randomize, random_swap, random_greedy_swap, greedy, annealing, cluster
-from code.visualisation import visualise as vis
+from code.classes import district, cable
+import random, copy
 
 if __name__ == "__main__":
     
