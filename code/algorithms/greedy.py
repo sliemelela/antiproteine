@@ -369,7 +369,7 @@ class SwapGreedy(Greedy):
             
             # If swapping for all batteries did not work, return False
             self.district.calculate_price()
-            return {"success": False, "swap": "WITH SWAP"}
+            return {"success": False, "swap": "WITH SWAP", "district": self.district}
         
         # If all houses are connected, return the result
         else:

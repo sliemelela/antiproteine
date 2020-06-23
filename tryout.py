@@ -1,5 +1,5 @@
-from code.classes import district, cable
-import random, copy
+from code.classes import district as dt, cable, cluster, 
+import random, copy 
 
 if __name__ == "__main__":
     
@@ -10,5 +10,5 @@ if __name__ == "__main__":
     # Generating cluster object
     clust = cluster.Cluster(district)
     result = clust.run_cluster()
-    
+
     vis.visualise(result["district"])
