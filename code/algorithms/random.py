@@ -108,6 +108,7 @@ class Random:
         # If some houses have no connection from the given houses, we have no succes
         if len(no_connections) > 0:
             success = False
+            
         # If all houses have a connection from the given houses, we have succes.
         else:
             success = True
