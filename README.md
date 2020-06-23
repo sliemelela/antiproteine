@@ -27,21 +27,20 @@ Or using conda:
 ```
 
 ### In Action
-An example can be run by calling:
+By calling
 ```bash
     python main.py
 ```
-
-The file provides an example for the use of the various functions used in this project.
+you are provided with a command line interface. The instructions are straight forward.
 
 ### Structure
 The following list describes the most important maps and file in the project, and where you can find them:
 
-- /code: contains all the code used for this project
-    - /code/algorithms: contains the code for the algorithms
-    - /code/classes: contains the code used for the classes (e.g. that are used in the algorithms)
-    - /code/visualisation: contains the code for visualising the configurations. 
-- /data: contains the various datafiles that for example specify the location of the houses and the batteries that are then used in the code.
+- **/code**: contains all the code used for this project
+    - **/code/algorithms**: contains the code for the algorithms
+    - **/code/classes**: contains the code used for the classes (e.g. that are used in the algorithms)
+    - **/code/visualisation**: contains the code for visualising the configurations. 
+- **/data**: contains the various datafiles that for example specify the location of the houses and the batteries that are then used in the code.
 
 ## Pseudo Code: The three cases
 ### Case 1: Location/amount of both the houses and batteries known
@@ -67,29 +66,79 @@ This algorithm is an optimization of the random algorithm.
 ```
 - First do random algorithm
 - Look for the battery with the highest remainder left.
-for houses in (list of houses that is connected to that battery):
+for house in (list of houses that is connected to that battery):
     - look for another battery that it can be connected to 
     - randomly choose a battery from that list of possible batteries
     - reconfigure the configuration
 ```
 
 Possible optimization: Instead of choosing a random battery, choose the battery with the lowest remainder (to leave more space for other houses).
-##### Random Greedy Swap Algorithm 
 
-This algorithm is an optimization of the random swap algorithm. 
+#### The Greedy Algorithms 
 
+##### Greedy House Algorithm
+This algorithm goes through a randomly sorted list of houses and tries to connect to the closest available battery. 
+The pseudo code is very straight forward.
 ```
-- First do random algorithm
-- Look for the battery with the highest remainder left.
-for houses in (list of houses that is connected to that battery):
-    - look for another battery that it can be connected to 
-    - choose the battery with the lowest remainder from that list of possible batteries
-    - reconfigure the configuration
+randomly shuffle list of houses
+for house in houses:
+    - look for closest battery to connect to 
+    - connect if there is an available
 ```
+If solution is not found, the swapping procedure is run (as described in Random Swap algorithm). 
+The pseudo code for that is the exact same as the random swap algorithm except that 
+```
+    randomly choose a battery from that list of possible batteries
+```
+becomes
+```
+    choose the battery from the list with the smallest remainder
+```
+such that swap becomes "greedy".
+
+What is important to note, is that the order of the houses greatly influences whether a solution will be found or not. 
+So the code repeats until a solution is found.
+
+
+##### Greedy Battery Algorithm
+This algorithm goes through the list of batteries (in the order that is provided by the dataset) and tries to connect houses to each battery. 
+The most straightforward way is to use the manhatten distance heuristic; first connect all the houses that are closest to the given battery.
+Another factor that is important to realise, is that if we would use the maxoutput of a house as a heuristic, that we would maybe a find a solution faster, but the price would not maybe not be the best.
+
+
+###### Heuristic: manhatten distance
+In this case the pseudo code is straight forward.
+```
+for battery in batteries:
+    - make a list of houses sorted by manhattan distance in ascending order
+    - connect to houses until it is not possible anymore
+```
+Note, that since we begin with the same order of batteries every time, this final configuration will always be the same for every run for every district.
+From here you can do the swapping algorithm if desired, in the same manner as in the greedy house algorithm.
+
+###### Simulated Annealing
+In this case, we want to combine the following heuristic given a battery:
+```python
+    house_score = w1 * manhatten_distance + w2 * house_maxoutput
+```
+for a given w1 and w2. Note that the final configuration using this new heuristic is going to give the exact same configuration for very run for every district. The question now becomes, which combination of w1 and w2 gives us the global minimum. 
+Unconventionally, we use simulated annealing on this landscape of w1, w2 as x,y coordinates and the total cost of a district as the z coordinate.
 
 ### Case 2: Location/amount of houses known; amount of batteries known
 
-### Case 3: Location/amount of houses known
+#### The Clustering Algorithm (k-means)
+Using some initial solution, we want to reposition the batteries in a better location. 
+The location that is most straight forward is by taking the mean position of all the houses per battery, and making that the new location.
+From here you try to find a new solution and repeat the process again. The process is stopped when the difference is price is smaller then some threshold. We chose to generate this initial solution and new solution with the most promising algorithm: the greedy house algorithm.
+Note that other algorithms could have been chosen, but due to the lack of time, this is not implemented yet.
+
+The pseudo code is then as follows:
+```
+- create initial solution with greedy house algorithm
+- reposition the batteries to the means of their collection of connected houses
+- if new location is on a house, change the location slightly, until this is not the case
+- repeat above procedure until difference in total cost of the new and old solution per iteration is smaller than some threshold (epsilon)
+```
 
 ## Authors
 - Sliem el Ela
