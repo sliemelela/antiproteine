@@ -145,6 +145,7 @@ class Greedy(randomize.Random):
 
             # Find houses that can possibly be connected to battery
             houses = self.find_houses(battery)
+            no_connections = []
 
             # First add the shorter distance houses until not possible anymore
             if len(houses) > 0:
@@ -157,7 +158,6 @@ class Greedy(randomize.Random):
                         break 
             
                 # Add the farther houses in the list if possible
-                no_connections = []
                 for house in houses:
                     if house.maxoutput < battery.remainder and len(house.cables) == 0:
                         cable = self.generate_random_cable(house, battery)

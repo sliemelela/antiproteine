@@ -137,6 +137,7 @@ The pseudo code is then as follows:
 - create initial solution with greedy house algorithm
 - reposition the batteries to the means of their collection of connected houses
 - if new location is on a house, change the location slightly, until this is not the case
+- if new price is worse than old price, repeat above procedure
 - repeat above procedure until difference in total cost of the new and old solution per iteration is smaller than some threshold (epsilon)
 ```
 
